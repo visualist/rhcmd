@@ -1,0 +1,6 @@
+
+source 'https://rubygems.org'
+gem 'rake', '12.0.0'
+
+gem 'rest-client'
+
