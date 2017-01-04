@@ -8,6 +8,12 @@ options = {}
 OptionParser.new do |option|
   option.on('-i', '--input FILE', 'Read from file') {|o| options[:file_in] = o}
   option.on('-o', '--output FILE', 'Write to file') {|o| options[:file_out] = o}
+  option.on('-j', '--json', 'Output JSON') do
+    options[:json] = true
+  end
+  option.on('-l', '--long', 'Long form output') do
+    options[:long] = true
+  end
 end.parse!
 
 cmd = ARGV.shift || "help"
