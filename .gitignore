@@ -1,0 +1,12 @@
+*.sqlite3
+*.swp
+*.old
+*.OLD
+*.log
+*.LOG
+*.out
+*.OUT
+/tmp
+*.tmp
+.env
+.bundle

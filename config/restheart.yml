@@ -1,0 +1,17 @@
+
+development:
+  host: <%= ENV['RHCMD_HOST'] || 'localhost'%>
+  port: <%= ENV['RHCMD_PORT'] || '8080' %>
+  user: <%= ENV['RHCMD_USER'] || 'user' %>
+  password: <%= ENV['RHCMD_PASS'] || 'passwd' %>
+  protocol: <%= ENV['RHCMD_PROTOCOL'] || 'http' %>
+  database: <%= ENV['RHCMD_DATABASE'] || 'devdb' %>
+
+test:
+  host: <%= ENV['RHCMD_HOST'] || 'localhost'%>
+  port: <%= ENV['RHCMD_PORT'] || '8080' %>
+  user: <%= ENV['RHCMD_USER'] || 'user' %>
+  password: <%= ENV['RHCMD_PASS'] || 'passwd' %>
+  protocol: <%= ENV['RHCMD_PROTOCOL'] || 'http' %>
+  database: <%= ENV['RHCMD_DATABASE'] || 'testdb' %>
+
