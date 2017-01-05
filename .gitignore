@@ -11,3 +11,4 @@
 .env
 .bundle
 /.ruby-*
+.DS_Store
