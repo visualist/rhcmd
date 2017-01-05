@@ -1,17 +1,24 @@
+require 'rest-client'
+require 'json'
+
+require_relative 'resource_path'
+require_relative 'hal_response'
+
 module Command
 
-  Available_commands = %w{help info config ls}.map(&:to_sym)
+  Available_commands = %w{ls get info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
   end
 
   def self.help args, options
-    puts "No help, as of yet."
+    commands = Available_commands.map{|i| i.to_s}.join(' ')
+    puts "Available commands: #{commands}"
   end
 
   def self.info args, options
-    puts "No info, as of yet."
+    config args, options
   end
 
   def self.config args, options
@@ -24,6 +31,35 @@ module Command
   end
 
   def self.ls args, options
+    rp = ResourcePath.new(args.first)
+    puts "URL: #{rp.url}" unless options[:json] if options[:long]
+    resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+    begin
+      response = resource.get
+    rescue RestClient::NotFound
+      puts "#{rp.path}: No such resource"
+      return
+    end
+
+    if options[:json]
+      puts response.body # response should already be in JSON
+    else
+      rh = HalResponse.new(response.body, options)
+      rh.loop(rp.path) if rh.valid
+    end
+  end
+
+  def self.get args, options
+    rp = ResourcePath.new(args.first)
+    puts "URL: #{rp.url}" unless options[:json] if options[:long]
+    resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+    begin
+      response = resource.get
+    rescue RestClient::NotFound
+      puts "#{rp.path}: No such resource"
+      return
+    end
+    puts response.body
   end
 
 end
