@@ -8,6 +8,9 @@ options = {}
 OptionParser.new do |option|
   option.on('-i', '--input FILE', 'Read from file') {|o| options[:file_in] = o}
   option.on('-o', '--output FILE', 'Write to file') {|o| options[:file_out] = o}
+  option.on('-f', '--hal-mode', 'HAL full mode') do
+    options[:hal_full] = true
+  end
   option.on('-j', '--json', 'Output JSON') do
     options[:json] = true
   end

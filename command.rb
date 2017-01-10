@@ -34,8 +34,11 @@ module Command
     rp = ResourcePath.new(args.first)
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
     resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+
+    params = {}
+    params = {'hal' => 'f'} if options[:hal_full]
     begin
-      response = resource.get
+      response = resource.get(params: params)
     rescue RestClient::NotFound
       puts "#{rp.path}: No such resource"
       return
@@ -53,8 +56,11 @@ module Command
     rp = ResourcePath.new(args.first)
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
     resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+
+    params = {}
+    params = {'hal' => 'f'} if options[:hal_full]
     begin
-      response = resource.get
+      response = resource.get(params: params)
     rescue RestClient::NotFound
       puts "#{rp.path}: No such resource"
       return
