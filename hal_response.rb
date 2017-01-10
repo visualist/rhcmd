@@ -20,13 +20,20 @@ class HalResponse
     prefix = '' if prefix=='/'
     get_items.each do |item|
       id = item['_id']
-      if id.is_a?(Hash) && id.has_key?('$oid')
+
+      if item.has_key?('desc')
+        desc = item['desc']
+
+      elsif id.is_a?(Hash) && id.has_key?('$oid')
         id = id['$oid']
         keys = item.keys.reject{|i| i=~/^_/}.sort.join(', ')
         desc = "#{keys}"
+
       else
-        desc = item['desc']
+        keys = item.keys.reject{|i| i=~/^_/}.sort.join(', ')
+        desc = "#{keys}"
       end
+
       etag = item['_etag']['$oid']
       if @options[:long]
         puts "#{prefix}/#{id}  #{etag}  \"#{desc}\""
