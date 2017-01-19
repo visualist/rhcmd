@@ -43,6 +43,36 @@ class HalResponse
     end
   end
 
+  def meta
+    desired_keys = %w{ _id desc _etag _size _total_pages
+                       _returned _type _lastupdated_on }
+    @data.select{|k,v| desired_keys.include?(k)}
+  end
+
+  def self_link
+    return @data['_links']['self']['href'] if @data['_links'] && @data['_links']['self']
+    nil
+  end
+
+  def first_link
+    return @data['_links']['first']['href'] if @data['_links'] && @data['_links']['first']
+    nil
+  end
+
+  def last_link
+    return @data['_links']['last']['href'] if @data['_links'] && @data['_links']['last']
+    nil
+  end
+
+  def next_link
+    return @data['_links']['next']['href'] if @data['_links'] && @data['_links']['next']
+    nil
+  end
+
+  def previous_link
+    return @data['_links']['previous']['href'] if @data['_links'] && @data['_links']['previous']
+  end
+
   private
 
   def get_items

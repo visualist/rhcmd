@@ -36,21 +36,38 @@ module Command
     resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
 
     params = {'count' => true} # probably doesn't do much good for an 'ls'
-    params['hal'] = 'f' if options[:hal_full]
+    # hal-full is also needed for the 'all' option: provides the 'next' link
+    params['hal'] = 'f' if options[:hal_full] || options[:all]
     params['page'] = options[:page_number] if options[:page_number]
 
+    if options[:all]
+      page = 1
+      loop do
+        params['page'] = page
+        nxt = getlist(rp, resource, params, options)
+        break if nxt.nil?
+        page += 1
+      end
+    else
+      getlist(rp, resource, params, options)
+    end
+  end
+
+  def self.getlist rp, resource, params, options
     begin
       response = resource.get(params: params)
     rescue RestClient::NotFound
       puts "#{rp.path}: No such resource"
-      return
+      return nil
     end
 
     if options[:json]
       puts response.body # response should already be in JSON
+      return nil
     else
       rh = HalResponse.new(response.body, options)
       rh.loop(rp.path) if rh.valid
+      return rh.next_link
     end
   end
 
