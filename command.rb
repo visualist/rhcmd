@@ -35,8 +35,10 @@ module Command
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
     resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
 
-    params = {}
-    params = {'hal' => 'f'} if options[:hal_full]
+    params = {'count' => true} # probably doesn't do much good for an 'ls'
+    params['hal'] = 'f' if options[:hal_full]
+    params['page'] = options[:page_number] if options[:page_number]
+
     begin
       response = resource.get(params: params)
     rescue RestClient::NotFound
@@ -57,8 +59,10 @@ module Command
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
     resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
 
-    params = {}
+    params = {'count' => true}
     params = {'hal' => 'f'} if options[:hal_full]
+    params['page'] = options[:page_number] if options[:page_number]
+
     begin
       response = resource.get(params: params)
     rescue RestClient::NotFound

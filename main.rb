@@ -8,6 +8,11 @@ options = {}
 OptionParser.new do |option|
   option.on('-i', '--input FILE', 'Read from file') {|o| options[:file_in] = o}
   option.on('-o', '--output FILE', 'Write to file') {|o| options[:file_out] = o}
+
+  option.on('-p', '--page page_number', 'Request page number') do |o|
+    options[:page_number] = o
+  end
+
   option.on('-f', '--hal-mode', 'HAL full mode') do
     options[:hal_full] = true
   end
