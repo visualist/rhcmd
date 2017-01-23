@@ -37,6 +37,10 @@ class HalResponse
       etag = item['_etag']['$oid']
       if @options[:long]
         puts "#{prefix}/#{id}  #{etag}  \"#{desc}\""
+      elsif @options[:custom]
+        #puts "#{prefix}/#{id} #{item['artmedia_id']}"
+        puts "#{prefix}/#{id},#{item['artmedia_id']}"
+        #puts "#{prefix}/#{id} #{item}"
       else
         puts "#{prefix}/#{id}"
       end
