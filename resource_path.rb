@@ -9,6 +9,16 @@ class ResourcePath
     @url = "#{@base_url}#{@path}"
   end
 
+  def what
+    path_components = path.split('/').reject(&:empty?)
+    n = path_components.count
+    return :root if n==0
+    return :db   if n==1
+    return :col  if n==2
+    return :doc  if n==3
+    return :unknown
+  end
+
   private
 
   def make_path_for path

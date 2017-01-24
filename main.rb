@@ -41,7 +41,12 @@ end.parse!
 cmd = ARGV.shift || "help"
 cmd_s = cmd.to_sym
 if Command.available_command(cmd_s)
-  Command.send(cmd_s, ARGV, options)
+  begin
+    Command.send(cmd_s, ARGV, options)
+  rescue CommandException => e
+    $stderr.puts "Error: #{e.message}"
+    exit 1
+  end
 else
   puts "Unrecognized subcommand: #{cmd}"
   exit(1)

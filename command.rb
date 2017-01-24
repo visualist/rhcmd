@@ -4,15 +4,18 @@ require 'json'
 require_relative 'resource_path'
 require_relative 'hal_response'
 
+class CommandException < Exception; end
+
 module Command
 
   # ls  - listing
   # get - get an individual object (db, table, doc)
   # dl  - download (objects in a collection)
+  # up  - upload (objects into a collection)
   # cr  - create object (db, table, doc)
   # info help config 
 
-  Available_commands = %w{ls get dl cr info help config}.map(&:to_sym)
+  Available_commands = %w{ls get dl up cr info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
@@ -97,6 +100,13 @@ module Command
       break if nxt.nil?
       page += 1
     end
+  end
+
+  def self.up args, options
+    raise CommandException.new("input file required") unless options[:file_in]
+    rp = ResourcePath.new(args.first)
+    raise CommandException.new("target collection/table required") unless rp.what==:col
+    # TBD
   end
 
   def self.getlist rp, resource, params, options
