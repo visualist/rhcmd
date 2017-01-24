@@ -47,10 +47,8 @@ module Command
     headers = { :content_type => "application/json",
                 :accept => "application/json, */*" }
     begin
-
       response = resource.get()
       etag = JSON.parse(response.body)["_etag"]["$oid"]
-
       headers.merge!({'If-Match' => etag})
       response = resource.patch(payload, headers)
       puts "PATCH #{rp.path}" if options[:verbose]
@@ -106,7 +104,22 @@ module Command
     raise CommandException.new("input file required") unless options[:file_in]
     rp = ResourcePath.new(args.first)
     raise CommandException.new("target collection/table required") unless rp.what==:col
-    # TBD
+    infile = options[:file_in]
+    File.readlines(infile).each do |line|
+      path, json = line.split(',', 2)
+      path_components = path.split('/').reject(&:empty?)
+      db, tbl, doc = path_components
+      if path_components.count==3
+        docpath = "#{rp.path}/#{doc}"
+        rh_submit(docpath, JSON.parse(json))
+      end
+    end
+  end
+
+  def self.rh_submit docpath, jsondata
+    params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
+    puts "PUT #{docpath} #{params}"
+    # TODO: submit to RH TBD
   end
 
   def self.getlist rp, resource, params, options
