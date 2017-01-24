@@ -27,6 +27,9 @@ OptionParser.new do |option|
   option.on('-l', '--long', 'Long form output') do
     options[:long] = true
   end
+# option.on('-d', '--download', 'download option') do
+#   options[:custom] = true
+# end
   option.on('-c', '--custom', 'specialized output with ls') do
     options[:custom] = true
   end

@@ -3,8 +3,9 @@ class HalResponse
   attr_accessor :data, :valid, :type, :embed_key
 
   def initialize json_body, options
+    @json_body = json_body
     @options = options
-    @data = JSON.parse(json_body)
+    @data = JSON.parse(@json_body)
     @valid = @data.has_key?('_embedded')
     if @valid
       @embed_key = @data['_embedded'].keys.first # probably bad assumption, long term
@@ -37,6 +38,10 @@ class HalResponse
       etag = item['_etag']['$oid']
       if @options[:long]
         puts "#{prefix}/#{id}  #{etag}  \"#{desc}\""
+
+      elsif @options[:download]
+        puts "#{prefix}/#{id},#{@json_body}"
+
       elsif @options[:custom]
         #puts "#{prefix}/#{id} #{item['artmedia_id']}"
         puts "#{prefix}/#{id},#{item['artmedia_id']}"

@@ -6,7 +6,7 @@ require_relative 'hal_response'
 
 module Command
 
-  Available_commands = %w{ls get info help config}.map(&:to_sym)
+  Available_commands = %w{ls get dl info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
@@ -50,6 +50,24 @@ module Command
       end
     else
       getlist(rp, resource, params, options)
+    end
+  end
+
+  def self.dl args, options
+    rp = ResourcePath.new(args.first)
+    #puts "URL: #{rp.url}" unless options[:json] if options[:long]
+    resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+    options.merge!({download: true})
+
+    params = {'count' => true}
+    params['hal'] = 'f'
+
+    page = 1
+    loop do
+      params['page'] = page
+      nxt = getlist(rp, resource, params, options)
+      break if nxt.nil?
+      page += 1
     end
   end
 
