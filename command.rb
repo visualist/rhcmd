@@ -6,7 +6,13 @@ require_relative 'hal_response'
 
 module Command
 
-  Available_commands = %w{ls get dl info help config}.map(&:to_sym)
+  # ls  - listing
+  # get - get an individual object (db, table, doc)
+  # dl  - download (objects in a collection)
+  # cr  - create object (db, table, doc)
+  # info help config 
+
+  Available_commands = %w{ls get dl cr info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
@@ -28,6 +34,28 @@ module Command
     end
     puts "Args: #{args}"
     puts "Opts: #{options}"
+  end
+
+  def self.cr args, options
+    rp = ResourcePath.new(args.first)
+    resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+    attributes = {} # TODO: eventually provide a means to put data here
+    payload = attributes.to_json
+    headers = { :content_type => "application/json",
+                :accept => "application/json, */*" }
+    begin
+
+      response = resource.get()
+      etag = JSON.parse(response.body)["_etag"]["$oid"]
+
+      headers.merge!({'If-Match' => etag})
+      response = resource.patch(payload, headers)
+      puts "PATCH #{rp.path}" if options[:verbose]
+
+    rescue RestClient::NotFound
+      response = resource.put(payload, headers)
+      puts "PUT #{rp.path}" if options[:verbose]
+    end
   end
 
   def self.ls args, options
