@@ -40,7 +40,7 @@ class HalResponse
         puts "#{prefix}/#{id}  #{etag}  \"#{desc}\""
 
       elsif @options[:download]
-        puts "#{prefix}/#{id},#{@json_body}"
+        puts "#{prefix}/#{id},#{item.to_json}"
 
       elsif @options[:custom]
         #puts "#{prefix}/#{id} #{item['artmedia_id']}"
