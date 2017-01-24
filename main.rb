@@ -8,6 +8,9 @@ options = {}
 OptionParser.new do |option|
   option.on('-i', '--input FILE', 'Read from file') {|o| options[:file_in] = o}
   option.on('-o', '--output FILE', 'Write to file') {|o| options[:file_out] = o}
+  option.on('-v', '--verbose', 'Verbose output') do
+    options[:verbose] = true
+  end
 
   # Note: all-option will override page number for 'ls'
   option.on('-a', '--all', 'Request all objects for ls') do
