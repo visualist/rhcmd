@@ -24,6 +24,9 @@ OptionParser.new do |option|
   option.on('-f', '--hal-mode', 'HAL full mode') do
     options[:hal_full] = true
   end
+  option.on('-t', '--target', 'Specify target table (override)') do
+    options[:target] = true # uses the command line param as target value
+  end
   option.on('-j', '--json', 'Output JSON') do
     options[:json] = true
   end

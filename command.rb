@@ -134,14 +134,34 @@ module Command
     rp = ResourcePath.new(args.first)
     raise CommandException.new("target collection/table required") unless rp.what==:col
     infile = options[:file_in]
+    linenumber = 0
     File.readlines(infile).each do |line|
-      path, json = line.split(',', 2)
-      path_components = path.split('/').reject(&:empty?)
-      db, tbl, doc = path_components
-      if path_components.count==3
-        docpath = "#{rp.path}/#{doc}"
-        rh_submit(docpath, JSON.parse(json))
+      linenumber += 1
+      if line =~ /^P/
+        verb, path, json = line.split(' ', 3)
+        verb.downcase!
+      elsif line =~ /^\//
+        path, json = line.split(',', 2)
+        verb = "put"
+      else
+        truncated_text = line.gsub(/^(.{45,}?).*$/m, '\1')
+        $stderr.puts "Warning: skipping line #{linenumber}: #{truncated_text}..."
+        next
       end
+
+      path_components = path.split('/').reject(&:empty?)
+
+      # TODO: generalize this: allow override path-component by component
+      db, tbl, doc = path_components # this line might become obsolete!
+      if path_components.count==3 && options[:target]
+          # Overrides file-specified /db/col, uses cmd-line param
+          docpath = "#{rp.path}/#{doc}"
+
+        else
+          # Uses the file-specified object /db/col/doc or whatecer
+          docpath = "/#{path_components.join('/')}"
+      end
+      rh_submit(docpath, JSON.parse(json))
     end
   end
 
