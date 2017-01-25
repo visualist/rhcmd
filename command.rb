@@ -16,7 +16,7 @@ module Command
   # cr  - create object (db, table, doc)
   # info help config 
 
-  Available_commands = %w{ls get dl up cr info help config}.map(&:to_sym)
+  Available_commands = %w{ls get dl up cr rm info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
@@ -38,6 +38,26 @@ module Command
     end
     puts "Args: #{args}"
     puts "Opts: #{options}"
+  end
+
+  # Remove - destructive command!
+  def self.rm args, options
+    rp = ResourcePath.new(args.first)
+    puts "URL: #{rp.url}" unless options[:json] if options[:long]
+    rh = Restheart::Connection.new(Config)
+
+    params = {}
+    #params = {'hal' => 'f'} if options[:hal_full]
+    #params['page'] = options[:page_number] if options[:page_number]
+
+    rresponse = rh.get(rp.path, params)
+    etag = rresponse.data['_etag']['$oid']
+
+    headers = {}
+    headers.merge!({'If-Match' => etag})
+
+    rresponse = rh.delete(rp.path, headers)
+    puts rresponse
   end
 
   def self.cr args, options
