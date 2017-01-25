@@ -43,7 +43,7 @@ module Restheart
         response = Restheart::Response.new(http_response)
 
       rescue RestClient::NotFound
-        $stderr.puts "(get) Not Found: #{path}"
+        $stderr.puts "Object not found: #{path}"
         response = nil
 
       rescue RestClient::BadRequest
