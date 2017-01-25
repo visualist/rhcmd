@@ -3,6 +3,7 @@ require 'json'
 
 require_relative 'resource_path'
 require_relative 'hal_response'
+require_relative 'restheart'
 
 class CommandException < Exception; end
 
@@ -143,19 +144,14 @@ module Command
   def self.get args, options
     rp = ResourcePath.new(args.first)
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
-    resource = RestClient::Resource.new(rp.url, Config.user, Config.password)
+    rh = Restheart::Connection.new(Config)
 
     params = {'count' => true}
     params = {'hal' => 'f'} if options[:hal_full]
     params['page'] = options[:page_number] if options[:page_number]
 
-    begin
-      response = resource.get(params: params)
-    rescue RestClient::NotFound
-      puts "#{rp.path}: No such resource"
-      return
-    end
-    puts response.body
+    rresponse = rh.get(rp.path, params)
+    puts rresponse.json
   end
 
 end
