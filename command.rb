@@ -1,3 +1,11 @@
+
+#
+# TODO:
+#  Notes to self: presently there is a mixture of direct calls
+#  to RestClient, and indirect ones through the Restheart set
+#  of classes. The goal is to move completely to Restheart.
+#
+
 require 'rest-client'
 require 'json'
 
