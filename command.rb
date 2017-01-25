@@ -140,12 +140,21 @@ module Command
       if line =~ /^P/
         verb, path, json = line.split(' ', 3)
         verb.downcase!
+        if verb!="put" && verb!="patch"
+          why = "verb #{verb} not supported"
+          skip = "skipping line #{linenumber}"
+          truncated_text = line.gsub(/^(.{40,}?).*$/m, '\1')
+          $stderr.puts "Warning: #{why}, #{skip}: #{truncated_text}..."
+          next
+        end
       elsif line =~ /^\//
         path, json = line.split(',', 2)
         verb = "put"
       else
-        truncated_text = line.gsub(/^(.{45,}?).*$/m, '\1')
-        $stderr.puts "Warning: skipping line #{linenumber}: #{truncated_text}..."
+        why = "line not parsed"
+        skip = "skipping line #{linenumber}"
+        truncated_text = line.gsub(/^(.{50,}?).*$/m, '\1')
+        $stderr.puts "Warning: #{why}, #{skip}: #{truncated_text}..."
         next
       end
 
@@ -158,19 +167,19 @@ module Command
           docpath = "#{rp.path}/#{doc}"
 
         else
-          # Uses the file-specified object /db/col/doc or whatecer
+          # Uses the file-specified object /db/col/doc or whatever
           docpath = "/#{path_components.join('/')}"
       end
-      rh_submit(docpath, JSON.parse(json))
+      rh_submit(verb.to_sym, docpath, JSON.parse(json))
     end
   end
 
-  def self.rh_submit docpath, jsondata
+  def self.rh_submit verb, docpath, jsondata
     params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
     rh = Restheart::Connection.new(Config)
     rp = ResourcePath.new(docpath)
-    rresponse = rh.put(rp.path, params)
-    puts "PUT #{docpath} #{params} --> #{rresponse.inspect}"
+    rresponse = rh.send(verb, rp.path, params)
+    puts "#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
   end
 
   def self.getlist rp, resource, params, options
