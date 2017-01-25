@@ -24,7 +24,7 @@ module Command
   # cr  - create object (db, table, doc)
   # info help config 
 
-  Available_commands = %w{ls get dl up cr rm info help config}.map(&:to_sym)
+  Available_commands = %w{ls get size dl up cr rm info help config}.map(&:to_sym)
 
   def self.available_command subcmd
     Available_commands.include?(subcmd.to_sym)
@@ -171,13 +171,28 @@ module Command
     end
   end
 
+  def self.size args, options
+    rp = ResourcePath.new(args.first)
+    puts "URL: #{rp.url}" unless options[:json] if options[:long]
+    rh = Restheart::Connection.new(Config)
+    params = {'count' => true, 'hal' => 'f'}
+    rresponse = rh.get(rp.path, params)
+    return nil if rresponse.nil?
+    code = rresponse.code
+    data = JSON.parse(rresponse.json)
+    size = data['_size']
+    if code==200 && !size.nil?
+      puts size
+    end
+  end
+
   def self.get args, options
     rp = ResourcePath.new(args.first)
     puts "URL: #{rp.url}" unless options[:json] if options[:long]
     rh = Restheart::Connection.new(Config)
 
     params = {'count' => true}
-    params = {'hal' => 'f'} if options[:hal_full]
+    params['hal'] = 'f' if options[:hal_full]
     params['page'] = options[:page_number] if options[:page_number]
 
     rresponse = rh.get(rp.path, params)
