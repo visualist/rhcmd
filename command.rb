@@ -147,8 +147,10 @@ module Command
 
   def self.rh_submit docpath, jsondata
     params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
-    puts "PUT #{docpath} #{params}"
-    # TODO: submit to RH TBD
+    rh = Restheart::Connection.new(Config)
+    rp = ResourcePath.new(docpath)
+    rresponse = rh.put(rp.path, params)
+    puts "PUT #{docpath} #{params} --> #{rresponse.inspect}"
   end
 
   def self.getlist rp, resource, params, options
