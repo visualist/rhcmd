@@ -8,8 +8,19 @@ class HalResponse
     @data = JSON.parse(@json_body)
     @valid = @data.has_key?('_embedded')
     if @valid
-      @embed_key = @data['_embedded'].keys.first # probably bad assumption, long term
-      @type = @embed_key.gsub(/^rh:/, '')
+      embed = @data['_embedded']
+      case embed
+        when Array
+          @embed_key = nil # is there something else we can look at?
+          @items = embed
+        when Hash
+          @embed_key = @data['_embedded'].keys.first
+          @items = embed[@embed_key]
+        else
+          @embed_key = nil
+          @items = nil
+      end
+      @type = @embed_key.gsub(/^rh:/, '') unless @embed_key.nil?
     else
       @embed_key = nil
       @type = nil
@@ -85,7 +96,7 @@ class HalResponse
   private
 
   def get_items
-    @data['_embedded'][@embed_key]
+    @items
   end
 
 end
