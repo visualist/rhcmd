@@ -20,11 +20,15 @@ class HalResponse
           @embed_key = nil
           @items = nil
       end
-      @type = @embed_key.gsub(/^rh:/, '') unless @embed_key.nil?
+      #@type = @embed_key.gsub(/^rh:/, '') unless @embed_key.nil?
     else
       @embed_key = nil
-      @type = nil
       @valid = false
+    end
+    if @data.has_key?('_type')
+      @type = @data['_type'] # ROOT, DB, COLLECTION, DOCUMENT (as a string)
+    else
+      @type = nil
     end
   end
 
