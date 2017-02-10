@@ -50,7 +50,7 @@ class HalResponse
         desc = "#{keys}"
       end
 
-      etag = item['_etag']['$oid']
+      etag = item.has_key?('_etag') ? item['_etag']['$oid'] : ''
       if @options[:long]
         puts "#{prefix}/#{id}  #{etag}  \"#{desc}\""
 
