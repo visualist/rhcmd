@@ -130,12 +130,28 @@ module Command
   end
 
   def self.up args, options
-    raise CommandException.new("input file required") unless options[:file_in]
-    rp = ResourcePath.new(args.first)
-    raise CommandException.new("target collection/table required") unless rp.what==:col
-    infile = options[:file_in]
     linenumber = 0
-    File.readlines(infile).each do |line|
+
+    if options.has_key?(:standalone) && options[:standalone]
+      if options.has_key?(:file_in) && !options[:file_in].empty?
+        infile = options[:file_in]
+        contents = File.readlines(infile)
+puts "contents from file: #{infile}"
+      else
+        contents = $stdin
+puts "contents from stdin"
+      end
+
+    else
+puts "infile: #{infile}"
+      raise CommandException.new("input file required") unless options[:file_in]
+      rp = ResourcePath.new(args.first)
+      raise CommandException.new("target collection/table required") unless rp.what==:col
+      infile = options[:file_in]
+      contents = File.readlines(infile)
+    end
+
+    contents.each do |line|
       linenumber += 1
       if line =~ /^P/
         verb, path, json = line.split(' ', 3)
