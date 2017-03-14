@@ -2,11 +2,6 @@
 
 require_relative 'config'
 require_relative 'command'
-require 'optparse'
-
-#options = {}
-#OptionParser.new do |option|
-#end.parse!
 
 file = ARGV.shift
 if !file.nil?
