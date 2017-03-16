@@ -136,10 +136,10 @@ module Command
       if options.has_key?(:file_in) && !options[:file_in].empty?
         infile = options[:file_in]
         contents = File.readlines(infile)
-puts "contents from file: #{infile}"
+#puts "contents from file: #{infile}"
       else
         contents = $stdin
-puts "contents from stdin"
+#puts "contents from stdin"
       end
 
     else
