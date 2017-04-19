@@ -1,3 +1,10 @@
+preprod:
+  host: <%= ENV['RHCMD_HOST'] || 'prd-api.walkerart.org'%>
+  port: <%= ENV['RHCMD_PORT'] || '80' %>
+  user: <%= ENV['RHCMD_USER'] || 'user' %>
+  password: <%= ENV['RHCMD_PASS'] || 'passwd' %>
+  protocol: <%= ENV['RHCMD_PROTOCOL'] || 'http' %>
+  database: <%= ENV['RHCMD_DATABASE'] || 'prddb' %>
 
 development:
   host: <%= ENV['RHCMD_HOST'] || 'localhost'%>
