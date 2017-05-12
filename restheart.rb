@@ -95,29 +95,48 @@ module Restheart
                   :accept => "application/json, */*" }
 
       method_name = method.to_s
-      begin
-        http_response = resource.send(method, atr, headers)
-        response = Restheart::Response.new(http_response)
-        response_code = response.code
+      response_code = nil
 
-      rescue RestClient::NotFound => e
-        $stderr.puts "(#{method_name}) Not Found: #{path}"
-        response_code = e.http_code
+      loop do
+        begin
+          http_response = resource.send(method, atr, headers)
+          response = Restheart::Response.new(http_response)
+          response_code = response.code
+          done = true
 
-      rescue RestClient::BadRequest => e
-        $stderr.puts "(#{method_name}) Bad Request: #{path}"
-        response_code = e.http_code
+        rescue RestClient::NotFound => e
+          $stderr.puts "(#{method_name}) Not Found: #{path}"
+          response_code = e.http_code
+          done = true
 
-      rescue RestClient::NotAcceptable => e
-        $stderr.puts "(#{method_name}) Not Acceptable: #{path}"
-        response_code = e.http_code
+        rescue RestClient::BadRequest => e
+          $stderr.puts "(#{method_name}) Bad Request: #{path}"
+          response_code = e.http_code
+          done = true
 
-      rescue RestClient::PreconditionFailed => e
-        $stderr.puts "(#{method_name}) Not Acceptable: #{path}"
-        $stderr.puts "    #{response.inspect}"
-        response_code = e.http_code
+        rescue RestClient::NotAcceptable => e
+          $stderr.puts "(#{method_name}) Not Acceptable: #{path}"
+          response_code = e.http_code
+          done = true
 
+        rescue RestClient::PreconditionFailed => e
+          $stderr.puts "(#{method_name}) Not Acceptable: #{path}"
+          $stderr.puts "    #{response.inspect}"
+          response_code = e.http_code
+          done = true
+
+        rescue RestClient::Exceptions::OpenTimeout => e
+          $stderr.puts "(#{method_name}) Timeout: #{path}"
+          $stderr.puts "    #{response.inspect}"
+
+          # TODO: limit the number of retries
+          $stderr.puts "(#{method_name}) retrying.."
+          done = false
+
+        end
+        break if done
       end
+
       response_code
     end
 
