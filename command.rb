@@ -161,6 +161,20 @@ puts "infile: #{infile}"
           $stderr.puts "Warning: #{why}, #{skip}: #{truncated_text}..."
           next
         end
+
+      elsif line =~ /^D/
+        #delete
+        verb, path, json = line.split(' ', 3)
+        json = '{}'
+        verb.downcase!
+        if verb!="delete"
+          why = "verb #{verb} not supported"
+          skip = "skipping line #{linenumber}"
+          truncated_text = line.gsub(/^(.{40,}?).*$/m, '\1')
+          $stderr.puts "Warning: #{why}, #{skip}: #{truncated_text}..."
+          next
+        end
+
       elsif line =~ /^\//
         path, json = line.split(',', 2)
         verb = "put"
@@ -184,6 +198,10 @@ puts "infile: #{infile}"
           # Uses the file-specified object /db/col/doc or whatever
           docpath = "/#{path_components.join('/')}"
       end
+#p verb.to_sym
+#p docpath
+#p json
+#p JSON.parse(json)
       rh_submit(verb.to_sym, docpath, JSON.parse(json))
     end
   end
