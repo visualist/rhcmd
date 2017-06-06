@@ -56,13 +56,14 @@ class TableQuery
   def get_next_page
     @page += 1
     @position = 0
-    $stderr.puts "get page #{@page}"
+    #$stderr.puts "get page #{@page}"
     get_set
   end
 
   def get_set
     @params['page'] = @page
     rresponse = @rh.get(@rp.path, @params)
+    return nil if rresponse.nil?
     @response_code = rresponse.code
     @response_json = rresponse.json
     @response = JSON.parse(@response_json)
