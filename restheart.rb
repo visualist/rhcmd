@@ -78,6 +78,9 @@ module Restheart
       _write(:patch, path, attributes, etag)
     end
 
+    def noop path, attributes, etag=nil
+      200
+    end
 
     private
 
