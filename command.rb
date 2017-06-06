@@ -210,11 +210,8 @@ module Command
     mergetxt = ""
     if verb == :merge
       mergetxt = "MERGE:"
-      verb = :noop
       old_attributes = get_attributes(rh, rp.path)
-      a, b = compare_attributes(old_attributes, params)
-      puts " a ==> #{a.inspect}"
-      puts " b ==> #{b.inspect}"
+      verb, params = compare_attributes(old_attributes, params)
     end
     rresponse = rh.send(verb, rp.path, params)
     puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
@@ -230,19 +227,12 @@ module Command
   end
 
   def self.compare_attributes old_attr, new_attr
-    return [:noop, nil] if old_attr == new_attr
+    return [:noop, nil] if old_attr == new_attr # == requires Ruby2.3+
 
     diff_in_old = old_attr.reject{|k,v| new_attr[k] == v}
     diff_in_new = new_attr.reject{|k,v| old_attr[k] == v}
-
-    #p diff_in_old
-    #p diff_in_new
-
     missing = (diff_in_old.keys - diff_in_new.keys)
     added = (diff_in_new.keys - diff_in_old.keys)
-
-    #puts "*missing: #{missing}"
-    #puts "*added: #{added}"
 
     return [:put, new_attr] if old_attr.keys.count == 0
     return [:patch, diff_in_new] if (added.count >= 0) && (missing.count == 0)
