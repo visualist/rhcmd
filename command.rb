@@ -152,10 +152,10 @@ module Command
     contents.each do |line|
       linenumber += 1
 
-      if line =~ /^P/i
+      if line =~ /^[PM]/i
         verb, path, json = line.split(' ', 3)
         verb.downcase!
-        if verb!="put" && verb!="patch"
+        if verb!="put" && verb!="patch" && verb!="merge"
           why = "verb #{verb} not supported"
           skip = "skipping line #{linenumber}"
           truncated_text = line.gsub(/^(.{40,}?).*$/m, '\1')
@@ -207,8 +207,46 @@ module Command
     params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
     rh = Restheart::Connection.new(Config)
     rp = ResourcePath.new(docpath)
+    mergetxt = ""
+    if verb == :merge
+      mergetxt = "MERGE:"
+      verb = :noop
+      old_attributes = get_attributes(rh, rp.path)
+      a, b = compare_attributes(old_attributes, params)
+      puts " a ==> #{a.inspect}"
+      puts " b ==> #{b.inspect}"
+    end
     rresponse = rh.send(verb, rp.path, params)
-    puts "#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+  end
+
+  def self.get_attributes rh, path
+    response = rh.get(path)
+    attrs = {}
+    if !response.nil? && response.code==200
+      attrs = JSON.parse(response.json).reject{|k,v| k =~ /^_/}
+    end
+    attrs
+  end
+
+  def self.compare_attributes old_attr, new_attr
+    return [:noop, nil] if old_attr == new_attr
+
+    diff_in_old = old_attr.reject{|k,v| new_attr[k] == v}
+    diff_in_new = new_attr.reject{|k,v| old_attr[k] == v}
+
+    #p diff_in_old
+    #p diff_in_new
+
+    missing = (diff_in_old.keys - diff_in_new.keys)
+    added = (diff_in_new.keys - diff_in_old.keys)
+
+    #puts "*missing: #{missing}"
+    #puts "*added: #{added}"
+
+    return [:put, new_attr] if old_attr.keys.count == 0
+    return [:patch, diff_in_new] if (added.count >= 0) && (missing.count == 0)
+    [:put, new_attr]
   end
 
   def self.getlist rp, resource, params, options
