@@ -141,7 +141,7 @@ module Command
       end
 
     else
-puts "infile: #{infile}"
+      #puts "infile: #{infile}"
       raise CommandException.new("input file required") unless options[:file_in]
       rp = ResourcePath.new(args.first)
       raise CommandException.new("target collection/table required") unless rp.what==:col
@@ -151,7 +151,8 @@ puts "infile: #{infile}"
 
     contents.each do |line|
       linenumber += 1
-      if line =~ /^P/
+
+      if line =~ /^P/i
         verb, path, json = line.split(' ', 3)
         verb.downcase!
         if verb!="put" && verb!="patch"
@@ -162,7 +163,7 @@ puts "infile: #{infile}"
           next
         end
 
-      elsif line =~ /^D/
+      elsif line =~ /^D/i
         #delete
         verb, path, json = line.split(' ', 3)
         json = '{}'
@@ -198,10 +199,6 @@ puts "infile: #{infile}"
           # Uses the file-specified object /db/col/doc or whatever
           docpath = "/#{path_components.join('/')}"
       end
-#p verb.to_sym
-#p docpath
-#p json
-#p JSON.parse(json)
       rh_submit(verb.to_sym, docpath, JSON.parse(json))
     end
   end
