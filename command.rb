@@ -225,7 +225,7 @@ module Command
 
     case verb_used
       when :noop
-        $stderr.puts "noop - no sleep"
+        # $stderr.puts "noop - no sleep"
         return
 
       when :patch
