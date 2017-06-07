@@ -215,7 +215,7 @@ module Command
       verb, params = compare_attributes(old_attributes, params)
     end
     rresponse = rh.send(verb, rp.path, params)
-    puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    $stderr.puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
     {verb: verb}
   end
 
