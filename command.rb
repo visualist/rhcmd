@@ -242,8 +242,13 @@ module Command
   def self.getlist rp, resource, params, options
     begin
       response = resource.get(params: params)
+
+    rescue Errno::ECONNREFUSED
+      $stderr.puts "Connection refused, check config?"
+      return nil
+
     rescue RestClient::NotFound
-      puts "#{rp.path}: No such resource"
+      $stderr.puts "#{rp.path}: No such resource"
       return nil
     end
 
