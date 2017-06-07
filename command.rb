@@ -287,6 +287,7 @@ module Command
     params['page'] = options[:page_number] if options[:page_number]
 
     rresponse = rh.get(rp.path, params)
+    return rresponse.json if options[:return_json]
     puts rresponse.json
   end
 
