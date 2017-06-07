@@ -233,7 +233,7 @@ module Command
         sleep(1)
 
       when :put
-        $stderr.puts "patch - sleep 2"
+        $stderr.puts "put - sleep 2"
         sleep(2)
     end
   end
