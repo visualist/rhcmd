@@ -199,7 +199,8 @@ module Command
           # Uses the file-specified object /db/col/doc or whatever
           docpath = "/#{path_components.join('/')}"
       end
-      rh_submit(verb.to_sym, docpath, JSON.parse(json))
+      result = rh_submit(verb.to_sym, docpath, JSON.parse(json))
+      throttle_if_needed(result)
     end
   end
 
@@ -215,6 +216,26 @@ module Command
     end
     rresponse = rh.send(verb, rp.path, params)
     puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    {verb: verb}
+  end
+
+  def self.throttle_if_needed options
+    return if options[:verb].nil?
+    verb_used = options[:verb]
+
+    case verb_used
+      when :noop
+        $stderr.puts "noop - no sleep"
+        return
+
+      when :patch
+        $stderr.puts "patch - sleep 1"
+        sleep(1)
+
+      when :put
+        $stderr.puts "patch - sleep 2"
+        sleep(2)
+    end
   end
 
   def self.get_attributes rh, path
