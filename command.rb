@@ -199,12 +199,13 @@ module Command
           # Uses the file-specified object /db/col/doc or whatever
           docpath = "/#{path_components.join('/')}"
       end
-      result = rh_submit(verb.to_sym, docpath, JSON.parse(json))
+      result = rh_submit(verb.to_sym, docpath, JSON.parse(json), options)
+      result = nil if options.include?(:testrun)
       throttle_if_needed(result)
     end
   end
 
-  def self.rh_submit verb, docpath, jsondata
+  def self.rh_submit verb, docpath, jsondata, options={}
     params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
     rh = Restheart::Connection.new(Config)
     rp = ResourcePath.new(docpath)
@@ -214,7 +215,11 @@ module Command
       old_attributes = get_attributes(rh, rp.path)
       verb, params = compare_attributes(old_attributes, params)
     end
-    rresponse = rh.send(verb, rp.path, params)
+    if options.include?(:testrun)
+      rresponse = "N/A"
+    else
+      rresponse = rh.send(verb, rp.path, params)
+    end
     $stderr.puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
     {verb: verb}
   end
