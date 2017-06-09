@@ -183,6 +183,11 @@ module Command
       elsif line =~ /^\//
         path, json = line.split(',', 2)
         verb = "put"
+
+      elsif line =~ /^\s*#/ || line =~ /^\s*$/
+        # skip comments and blank lines
+        next
+
       else
         why = "line not parsed"
         skip = "skipping line #{linenumber}"
