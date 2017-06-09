@@ -149,6 +149,10 @@ module Command
       contents = File.readlines(infile)
     end
 
+    if options.has_key?(:testrun)
+      $stderr.puts "TESTRUN ONLY - no changes will be made"
+    end
+
     contents.each do |line|
       linenumber += 1
 
@@ -225,6 +229,7 @@ module Command
   end
 
   def self.throttle_if_needed options
+    return if options.nil?
     return if options[:verb].nil?
     verb_used = options[:verb]
 
