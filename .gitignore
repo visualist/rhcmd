@@ -8,7 +8,7 @@
 *.OUT
 /tmp
 *.tmp
-.env
+.env*
 .bundle
 /.ruby-*
 .DS_Store
