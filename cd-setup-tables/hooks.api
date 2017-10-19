@@ -1,3 +1,0 @@
-PATCH /webprod/artworks {"hooks":[{"name":"notify","args":["http://prd-cms.walkerart.org:80/"]}]}
-PATCH /webprod/artpeople {"hooks":[{"name":"notify","args":["http://prd-cms.walkerart.org:80/"]}]}
-PATCH /webprod/artmedia {"hooks":[{"name":"notify","args":["http://prd-cms.walkerart.org:80/"]}]}
