@@ -159,7 +159,7 @@ module Command
       if line =~ /^[PM]/i
         verb, path, json = line.split(' ', 3)
         verb.downcase!
-        if verb!="put" && verb!="patch" && verb!="merge"
+        if verb!="put" && verb!="patch" && verb!="merge" && verb!="post"
           why = "verb #{verb} not supported"
           skip = "skipping line #{linenumber}"
           truncated_text = line.gsub(/^(.{40,}?).*$/m, '\1')
