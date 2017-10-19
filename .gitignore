@@ -12,3 +12,4 @@
 .bundle
 /.ruby-*
 .DS_Store
+/data
