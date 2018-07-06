@@ -215,6 +215,7 @@ module Command
   end
 
   def self.rh_submit verb, docpath, jsondata, options={}
+    verbose = 1   # 0, 1, 2
     params = jsondata.reject{|k,v| k =~ /^_/ || k.to_sym=='id'}
     rh = Restheart::Connection.new(Config)
     rp = ResourcePath.new(docpath)
@@ -227,9 +228,17 @@ module Command
     if options.include?(:testrun)
       rresponse = "N/A"
     else
-      rresponse = rh.send(verb, rp.path, params)
+      begin
+        rresponse = rh.send(verb, rp.path, params)
+      rescue RestClient::Exceptions::ReadTimeout
+        $stderr.puts "RestClient::Exceptions::ReadTimeout - skipped #{rp.path}"
+      end
     end
-    $stderr.puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    if verbose > 1
+      $stderr.puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    elsif (verbose > 0) and verb.to_s.upcase!="NOOP"
+      $stderr.puts "#{mergetxt}#{verb.to_s.upcase} #{docpath} #{params} --> #{rresponse.inspect}"
+    end
     {verb: verb}
   end
 
